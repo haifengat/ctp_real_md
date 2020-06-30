@@ -1,37 +1,31 @@
-# ctp_real_md
+# tick_from_ctp
 
-#### 介绍
-ctp实时数据
+## 项目介绍
 
-#### 软件架构
-软件架构说明
+<del> 使用ctp api 从期货公司前置接收tick数据=>落地到csv文件=>合成分钟数据=>插入mongo库中 </del>
 
+使用ctp api接收行情生成实时分钟数据保存到redis
+
+## 逻辑
+
+1. onRspLogin中取当前交易日TradingDay
+2. onRspInstrument中取当前交易日对应的actionday; 取交易时间段设置; 启动行情接口; 启动查询[持仓/权益]
+3. <del> 查询确认结算时间,判断是否为隔夜启动,以决定是否清除原有数据. 确认日期为实际日期,并非交易日. </del>
+4. 登录成功后取tradingday与现有Tradingday比对,不相等即表示新的交易日登录
 
 #### 安装教程
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+`pip install -r requirements.txt`
 
 #### 使用说明
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1. 配置环境变量
+```bash
+export redis_addr=127.0.0.1:16379 # redis连接: 
+export pg_addr=postgresql://postgres:123456@127.0.0.1:15432/postgres  #postgresql 连接
+export front_trade=tcp://180.168.146.187:10101 #交易前置
+export front_quote=tcp://180.168.146.187:10111 # 行情前置
+export login_info=008105/1/9999/simnow_client_test/0000000000000000 # investor/password/broker/appid/authcode #登录信息
+```
+3. 7*24运行, python main.py config.yml
 
-#### 参与贡献
-
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
-
-
-#### 码云特技
-
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  码云官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解码云上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是码云最有价值开源项目，是码云综合评定出的优秀开源项目
-5.  码云官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  码云封面人物是一档用来展示码云会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
