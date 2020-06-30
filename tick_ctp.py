@@ -73,7 +73,7 @@ class TickCtp(object):
 
         # 隔夜时:行情重新登录后会重新获取夜盘的数据
         # if len(self.inst_pre_vol) == 0:
-        cfg.log.info('start quote')
+        cfg.log.info(f'req connect quote front address: {cfg.front_quote}')
         self.q.OnConnected = self.q_OnFrontConnected
         self.q.OnDisconnected = self.q_OnDisConnected
         self.q.OnUserLogin = self.q_OnRspUserLogin
@@ -264,6 +264,7 @@ class TickCtp(object):
         self.t.OnUserLogin = self.OnRspUserLogin
         self.t.OnDisConnected = self.OnFrontDisConnected
         self.t.OnInstrumentStatus = lambda x, y, z: str(z)
+        cfg.log.info(f'req connect trade front address: {cfg.front_trade}')
         self.t.ReqConnect(cfg.front_trade)
 
     def run_seven(self):
@@ -349,7 +350,7 @@ class TickCtp(object):
 
 def main():
     p = TickCtp()
-    p.run_seven()
+    p._run_seven()
 
 
 if __name__ == '__main__':

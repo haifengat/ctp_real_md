@@ -4,7 +4,6 @@ __title__ = '配置文档'
 __author__ = 'HaiFeng'
 __mtime__ = '20180821'
 
-import yaml
 import sys, os
 from redis import StrictRedis, ConnectionPool
 # from pymongo import MongoClient
@@ -37,10 +36,12 @@ port = 6379
 redis_host = os.environ['redis_addr']
 if ':' in redis_host:
     redis_host, port =  redis_host.split(':')
+log.info(f'connecting redis: {redis_host}:{port}')
 pool = ConnectionPool(host=redis_host, port=port, db=0, decode_responses=True)
 rds = StrictRedis(connection_pool=pool)
 
 pg_addr = os.environ['pg_addr']
+log.info(f'connection postgresql: {pg_addr}')
 pg: Engine = create_engine(pg_addr)
 
 # ctp前置格式 tcp://xxx.xxx.xxx.xxx:nnnnn

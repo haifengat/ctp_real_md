@@ -2,3 +2,4 @@ redis
 color_log
 py_ctp
 SQLAlchemy
+psycopg2-binary
