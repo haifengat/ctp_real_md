@@ -116,3 +116,4 @@ dmypy.json
 log*/
 *.json
 
+pgdata_bak.tgz
