@@ -117,3 +117,5 @@ log*/
 *.json
 
 pgdata_bak.tgz
+.git*/
+.vs*/
