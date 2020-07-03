@@ -32,6 +32,7 @@ class TickCtp(object):
         self.TradingDay = ''
         self.Actionday = ''
         self.Actionday1 = ''
+        # tick时间
         self.tick_time = ''
 
         # 计算指数相关
@@ -138,7 +139,6 @@ class TickCtp(object):
         if tick.Instrument not in self.received_tick:
             self.received_tick.append(tick.Instrument)
             return
-
         proc: InstrumentField = self.t.instruments.get(tick.Instrument)
         if not proc:
             return
@@ -146,47 +146,47 @@ class TickCtp(object):
         self.tick_min(tick, ut)
 
         # 指数合约合成分成
-        pre_time = self.product_time.get(proc.ProductID)
-        if not pre_time:
-            self.product_time[proc.ProductID] = tick.UpdateTime
-        elif pre_time != tick.UpdateTime and tick.UpdateTime[-2:0] != '00':  # 整分时等下一秒再处理,以处理小节收盘单tick的问题
-            self.product_time[proc.ProductID] = tick.UpdateTime
+        # pre_time = self.product_time.get(proc.ProductID)
+        # if not pre_time:
+        #     self.product_time[proc.ProductID] = tick.UpdateTime
+        # elif pre_time != tick.UpdateTime and tick.UpdateTime[-2:0] != '00':  # 整分时等下一秒再处理,以处理小节收盘单tick的问题
+        #     self.product_time[proc.ProductID] = tick.UpdateTime
 
-            # 计算合约权重
-            ticks = [f for k, f in self.q.inst_tick.items() if self.t.instruments[k].ProductID == proc.ProductID]
-            sum_oi = sum([f.OpenInterest for f in ticks])
-            if sum_oi == 0:
-                return
+        #     # 计算合约权重
+        #     ticks = [f for k, f in self.q.inst_tick.items() if self.t.instruments[k].ProductID == proc.ProductID]
+        #     sum_oi = sum([f.OpenInterest for f in ticks])
+        #     if sum_oi == 0:
+        #         return
 
-            rate = json.loads('{{{}}}'.format(','.join(['"{}":{}'.format(f.Instrument, f.OpenInterest / sum_oi) for f in ticks])))
-            # 计算000
-            tick000: Tick = Tick()
-            tick000.Instrument = proc.ProductID + '_000'
-            tick000.UpdateTime = tick.UpdateTime
-            for inst, rate in rate.items():
-                f: Tick = self.q.inst_tick[inst]
-                tick000.AskPrice += f.AskPrice * rate
-                tick000.BidPrice += f.BidPrice * rate
-                tick000.LastPrice += f.LastPrice * rate
-                tick000.AveragePrice += f.AveragePrice * rate
-                tick000.LowerLimitPrice += f.LowerLimitPrice * rate
-                tick000.UpperLimitPrice += f.UpperLimitPrice * rate
-                tick000.AskVolume += f.AskVolume
-                tick000.BidVolume += f.BidVolume
-                tick000.Volume += f.Volume
-                tick000.OpenInterest += f.OpenInterest
-            try:
-                # 防止因值为 sys.float_info.max 而报错: 只有lastprice参与分钟数据计算
-                # tick000.AskPrice = round(tick000.AskPrice / proc.PriceTick) * proc.PriceTick
-                # tick000.BidPrice = round(tick000.BidPrice / proc.PriceTick) * proc.PriceTick
-                tick000.LastPrice = round(tick000.LastPrice / proc.PriceTick) * proc.PriceTick
-                # tick000.AveragePrice = round(tick000.AveragePrice / proc.PriceTick) * proc.PriceTick
-                # tick000.LowerLimitPrice = round(tick000.LowerLimitPrice / proc.PriceTick) * proc.PriceTick
-                # tick000.UpperLimitPrice = round(tick000.UpperLimitPrice / proc.PriceTick) * proc.PriceTick
-            except Exception as identifier:
-                cfg.log.error(str(identifier))
-                # cfg.log.error('tick:{0}-{1},000:{2},rate:{3}'.format(tick.Instrument, tick.AskPrice, tick000.AskPrice, proc.PriceTick))
-            self.tick_min(tick000, ut)
+        #     rate = json.loads('{{{}}}'.format(','.join(['"{}":{}'.format(f.Instrument, f.OpenInterest / sum_oi) for f in ticks])))
+        #     # 计算000
+        #     tick000: Tick = Tick()
+        #     tick000.Instrument = proc.ProductID + '_000'
+        #     tick000.UpdateTime = tick.UpdateTime
+        #     for inst, rate in rate.items():
+        #         f: Tick = self.q.inst_tick[inst]
+        #         tick000.AskPrice += f.AskPrice * rate
+        #         tick000.BidPrice += f.BidPrice * rate
+        #         tick000.LastPrice += f.LastPrice * rate
+        #         tick000.AveragePrice += f.AveragePrice * rate
+        #         tick000.LowerLimitPrice += f.LowerLimitPrice * rate
+        #         tick000.UpperLimitPrice += f.UpperLimitPrice * rate
+        #         tick000.AskVolume += f.AskVolume
+        #         tick000.BidVolume += f.BidVolume
+        #         tick000.Volume += f.Volume
+        #         tick000.OpenInterest += f.OpenInterest
+        #     try:
+        #         # 防止因值为 sys.float_info.max 而报错: 只有lastprice参与分钟数据计算
+        #         # tick000.AskPrice = round(tick000.AskPrice / proc.PriceTick) * proc.PriceTick
+        #         # tick000.BidPrice = round(tick000.BidPrice / proc.PriceTick) * proc.PriceTick
+        #         tick000.LastPrice = round(tick000.LastPrice / proc.PriceTick) * proc.PriceTick
+        #         # tick000.AveragePrice = round(tick000.AveragePrice / proc.PriceTick) * proc.PriceTick
+        #         # tick000.LowerLimitPrice = round(tick000.LowerLimitPrice / proc.PriceTick) * proc.PriceTick
+        #         # tick000.UpperLimitPrice = round(tick000.UpperLimitPrice / proc.PriceTick) * proc.PriceTick
+        #     except Exception as identifier:
+        #         cfg.log.error(str(identifier))
+        #         # cfg.log.error('tick:{0}-{1},000:{2},rate:{3}'.format(tick.Instrument, tick.AskPrice, tick000.AskPrice, proc.PriceTick))
+        #     self.tick_min(tick000, ut)
 
     def tick_min(self, tick: Tick, ut: str):
         actionday = self.TradingDay
@@ -350,7 +350,7 @@ class TickCtp(object):
 
 def main():
     p = TickCtp()
-    p._run_seven()
+    threading.Thread(target=p._run_seven).start()
 
 
 if __name__ == '__main__':
