@@ -32,8 +32,10 @@ ENTRYPOINT ["python", "/home/tick_ctp.py"]
 ```
 ### build
 ```bash
-docker build -t haifengat/ctp_real_md:`date +%Y%m%d` . && docker push haifengat/ctp_real_md:`date +%Y%m%d`
-docker tag haifengat/ctp_real_md:`date +%Y%m%d` haifengat/ctp_real_md && docker push haifengat/ctp_real_md
+# 通过github git push触发 hub.docker自动build
+docker pull haifengat/ctp_real_md && docker tag haifengat/ctp_real_md haifengat/ctp_real_md:`date +%Y%m%d` && docker push haifengat/ctp_real_md:`date +%Y%m%d`
+#docker build -t haifengat/ctp_real_md:`date +%Y%m%d` . && docker push haifengat/ctp_real_md:`date +%Y%m%d`
+#docker tag haifengat/ctp_real_md:`date +%Y%m%d` haifengat/ctp_real_md && docker push haifengat/ctp_real_md
 ```
 
 ### docker-compose.yaml
