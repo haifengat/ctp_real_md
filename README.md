@@ -9,12 +9,12 @@
 将镜像中带的postgres数据取出即可获得交易日历和品种交易时间数据库
 ```bash
 docker run -itd --name tmp haifengat/ctp_real_md
+docker cp tmp:/home/docker-compose.yml .
 docker cp tmp:/home/pgdata.tgz .
 tar -xzf pgdata.tgz
 docker rm -f tmp
 docker-compose up -d
 ```
-
 
 ## Dockerfile
 ```dockerfile
@@ -30,12 +30,11 @@ ENV front_quote tcp://180.168.146.187:10111
 ENV login_info 008105/1/9999/simnow_client_test/0000000000000000
 ENTRYPOINT ["python", "/home/tick_ctp.py"]
 ```
+
 ### build
 ```bash
 # 通过github git push触发 hub.docker自动build
 docker pull haifengat/ctp_real_md && docker tag haifengat/ctp_real_md haifengat/ctp_real_md:`date +%Y%m%d` && docker push haifengat/ctp_real_md:`date +%Y%m%d`
-#docker build -t haifengat/ctp_real_md:`date +%Y%m%d` . && docker push haifengat/ctp_real_md:`date +%Y%m%d`
-#docker tag haifengat/ctp_real_md:`date +%Y%m%d` haifengat/ctp_real_md && docker push haifengat/ctp_real_md
 ```
 
 ### docker-compose.yaml
