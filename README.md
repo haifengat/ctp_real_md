@@ -42,7 +42,7 @@ docker pull haifengat/ctp_real_md && docker tag haifengat/ctp_real_md haifengat/
 version: '3.1'
 services:
   real_md:
-    image: haifengat/ctp_real_md:0.0.1
+    image: haifengat/ctp_real_md
     container_name: real_md
     restart: always
     environment:
