@@ -5,8 +5,7 @@ __author__ = 'HaiFeng'
 __mtime__ = '20180723'
 
 import threading
-import sys
-import json
+import sys, csv, json
 import getpass
 from time import sleep
 from datetime import datetime, timedelta
@@ -220,33 +219,40 @@ class TickCtp(object):
 
 
     def get_actionday(self):
-        conn = cfg.pg.raw_connection()
-        cursor = conn.cursor()
-        cursor.execute('''select "day" from future.calendar where tra and "day" between to_char(now()::timestamp + '-30 days', 'yyyyMMdd') and to_char(now()::timestamp + '30 days', 'yyyyMMdd')''')
-        self.trading_days = [c[0] for c in cursor.fetchall()]
+        with open('./calendar.csv') as f:
+            reader = csv.DictReader(f)
+            for r in reader:
+                if r['tra'] == 'false':
+                    continue
+                self.trading_days.append(r['day'])
         # 接口未登录,不计算Actionday
         if self.TradingDay == '':
             return
+
         self.Actionday = self.TradingDay if self.trading_days.index(self.TradingDay) == 0 else self.trading_days[self.trading_days.index(self.TradingDay) - 1]
         self.Actionday1 = (datetime.strptime(self.Actionday, '%Y%m%d') + timedelta(days=1)).strftime('%Y%m%d')
 
     def get_trading_time(self):
         self.trade_time.clear()
-        times = []
-        conn = cfg.pg.raw_connection()
-        cursor = conn.cursor()
-        cursor.execute('select "GroupId", "WorkingTimes" from (select "GroupId", "OpenDate",  "WorkingTimes", row_number() over(partition by "GroupId" order by "OpenDate" desc) as row_no from future.tradingtime) a where row_no=1')
-        g = cursor.fetchall()
-        times = [{t[0]: json.loads(f'{t[1]}')} for t in g]
-        # 按时间排序, 确保最后实施的时间段作为依据.
+        tmp = {}
+        # conn = cfg.pg.raw_connection()
+        # cursor = conn.cursor()
+        # cursor.execute('select "GroupId", "WorkingTimes" from (select "GroupId", "OpenDate",  "WorkingTimes", row_number() over(partition by "GroupId" order by "OpenDate" desc) as row_no from future.tradingtime) a where row_no=1')
+        # g = cursor.fetchall()
+        with open('./tradingtime.csv') as f:
+            reader = csv.DictReader(f)
+            proc_day = {}
+            for r in reader:
+                # 按时间排序, 确保最后实施的时间段作为依据.
+                if r['GroupId'] not in proc_day or r['OpenDate'] > proc_day[r['GroupId']]:
+                    tmp[r['GroupId']] = r['WorkingTimes']
+                proc_day[r['GroupId']] = r['OpenDate']
         # 根据时间段设置,生成 opens; ends; mins盘中时间
-        for group in times:
-            g_id = list(group.keys())[0]
-            section = list(group.values())[0]
+        for g_id, section  in tmp.items():
             opens = []
             ends = []
             mins = []
-            for s in section:
+            for s in json.loads(section):
                 opens.append((datetime.strptime(s['Begin'], '%H:%M:%S') + timedelta(minutes=-1)).strftime('%H:%M:00'))
                 ends.append(s['End'])
                 t_begin = datetime.strptime('20180101' + s['Begin'], '%Y%m%d%H:%M:%S')
@@ -284,6 +290,7 @@ class TickCtp(object):
             left_days = list(filter(lambda x: x > day, self.trading_days))
             if len(left_days) == 0:
                 self.get_actionday()
+                self.get_trading_time()
                 left_days = list(filter(lambda x: x > day, self.trading_days))
             next_trading_day = left_days[0]
             has_hight = (datetime.strptime(next_trading_day, '%Y%m%d') - datetime.strptime(day, '%Y%m%d')).days in [1, 3]

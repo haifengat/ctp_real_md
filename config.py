@@ -19,9 +19,6 @@ log = Logger()
 if 'redis_addr' not in os.environ:
     log.error('there is no config for redis!!!')
     sys.exit(-1)
-if 'pg_addr' not in os.environ:
-    log.error('there is no config for postgres!!!')
-    sys.exit(-1)
 if 'front_trade' not in os.environ:
     log.error('there is no config for CTP trade!!!')
     sys.exit(-1)
@@ -39,10 +36,6 @@ if ':' in redis_host:
 log.info(f'connecting redis: {redis_host}:{port}')
 pool = ConnectionPool(host=redis_host, port=port, db=0, decode_responses=True)
 rds = StrictRedis(connection_pool=pool)
-
-pg_addr = os.environ['pg_addr']
-log.info(f'connection postgresql: {pg_addr}')
-pg: Engine = create_engine(pg_addr)
 
 # ctp前置格式 tcp://xxx.xxx.xxx.xxx:nnnnn
 front_trade = os.environ['front_trade']
