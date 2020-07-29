@@ -11,36 +11,28 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from color_log import Logger
 
-
 log = Logger()
 
-
-# 检查配置
-if 'redis_addr' not in os.environ:
-    log.error('there is no config for redis!!!')
-    sys.exit(-1)
-if 'front_trade' not in os.environ:
-    log.error('there is no config for CTP trade!!!')
-    sys.exit(-1)
-if 'front_quote' not in os.environ:
-    log.error('there is no config for CTP quote!!!')
-    sys.exit(-1)
-if 'login_info' not in os.environ:
-    log.error('there is no config for CTP login info!!!')
-    sys.exit(-1)
-
-port = 6379
-redis_host = os.environ['redis_addr']
-if ':' in redis_host:
-    redis_host, port =  redis_host.split(':')
+redis_host, port = 'redis_tick', 6379
+if 'redis_addr' in os.environ:
+    redis_host = os.environ['redis_addr']
+    if ':' in redis_host:
+        redis_host, port =  redis_host.split(':')
 log.info(f'connecting redis: {redis_host}:{port}')
 pool = ConnectionPool(host=redis_host, port=port, db=0, decode_responses=True)
 rds = StrictRedis(connection_pool=pool)
 
-# ctp前置格式 tcp://xxx.xxx.xxx.xxx:nnnnn
-front_trade = os.environ['front_trade']
-front_quote = os.environ['front_quote']
+front_trade='tcp://180.168.146.187:10101'
+if 'front_trade' in os.environ:
+    front_trade = os.environ['front_trade']
+
+front_quote='tcp://180.168.146.187:10111'
+if 'front_quote' in os.environ:
+    front_quote = os.environ['front_quote']
+
 # investor/password/broker/appid/authcode
-login_info = os.environ['login_info']
+login_info='008105/1/9999/simnow_client_test/0000000000000000'
+if 'login_info' in os.environ:
+    login_info = os.environ['login_info']
 investor, pwd, broker, appid, authcode = login_info.split('/')
 

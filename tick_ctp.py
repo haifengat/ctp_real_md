@@ -5,7 +5,7 @@ __author__ = 'HaiFeng'
 __mtime__ = '20180723'
 
 import threading
-import sys, csv, json
+import sys, csv, json, os
 import getpass
 from time import sleep
 from datetime import datetime, timedelta
@@ -16,7 +16,6 @@ from py_ctp.quote import CtpQuote
 from py_ctp.structs import InfoField, Tick, InstrumentField
 from queue import Queue
 import config as cfg
-
 
 class TickCtp(object):
     """"""
@@ -39,6 +38,8 @@ class TickCtp(object):
         self.product_rate = {}
 
         self.inst_queue = Queue(0)
+        # 当前文件路径
+        self.cwd = os.path.dirname(os.path.realpath(__file__))
 
         self.t = CtpTrade()
         self.q = CtpQuote()
@@ -219,7 +220,7 @@ class TickCtp(object):
 
 
     def get_actionday(self):
-        with open('./calendar.csv') as f:
+        with open(os.path.join(self.cwd, 'calendar.csv')) as f:
             reader = csv.DictReader(f)
             for r in reader:
                 if r['tra'] == 'false':
@@ -239,7 +240,7 @@ class TickCtp(object):
         # cursor = conn.cursor()
         # cursor.execute('select "GroupId", "WorkingTimes" from (select "GroupId", "OpenDate",  "WorkingTimes", row_number() over(partition by "GroupId" order by "OpenDate" desc) as row_no from future.tradingtime) a where row_no=1')
         # g = cursor.fetchall()
-        with open('./tradingtime.csv') as f:
+        with open(os.path.join(self.cwd, 'tradingtime.csv')) as f:
             reader = csv.DictReader(f)
             proc_day = {}
             for r in reader:

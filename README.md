@@ -29,7 +29,7 @@ docker pull haifengat/ctp_real_md && docker tag haifengat/ctp_real_md haifengat/
 ```
 
 ### docker-compose.yaml
-```bash
+```yml
 version: '3.1'
 services:
   real_md:
@@ -52,5 +52,14 @@ services:
     environment:
       - TZ=Asia/Shanghai
     ports:
-      - "16379:6379"      
+      - "16379:6379"   
+```
+
+### 使用
+#### 查看redis数据
+```bash
+$ docker exec -it redis_tick bash
+>> redis-cli
+>>> keys *
+>>> lrange ${instrument} 0 -1
 ```
