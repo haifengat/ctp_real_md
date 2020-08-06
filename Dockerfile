@@ -1,4 +1,4 @@
-FROM haifengat/pyctp:2.3.2
+FROM haifengat/centos:8.1
 COPY *.py /home/
 COPY *.txt /home/
 # docker-compose
