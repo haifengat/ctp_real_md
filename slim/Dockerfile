@@ -5,14 +5,14 @@ timeout = 6000\
 index-url = https://mirrors.aliyun.com/pypi/simple/\
 trusted-host = mirrors.aliyun.com'\
 > ~/.pip/pip.conf
-COPY *.txt /home/
+COPY ../*.txt /home/
 RUN pip install --no-cache-dir -r /home/requirements.txt
 
-COPY *.py /home/
+COPY ../*.py /home/
 # docker-compose
-COPY *.yml /home/
+COPY ../*.yml /home/
 # COPY pgdata.tgz /home/ 改用csv
-COPY *.csv /home/
+COPY ../*.csv /home/
 
 ENV redis_addr 172.19.129.98:16379
 ENV front_trade tcp://180.168.146.187:10101
