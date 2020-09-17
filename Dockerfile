@@ -13,4 +13,4 @@ RUN set -ex; \
 WORKDIR /${PROJECT}-master
 RUN pip install --no-cache-dir -r ./requirements.txt
 
-ENTRYPOINT ["python", "tick_ctp.sh"]
+ENTRYPOINT ["python", "tick_ctp.py"]
