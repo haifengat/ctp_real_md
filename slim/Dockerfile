@@ -1,11 +1,6 @@
 FROM python:3.6.12-slim
-RUN mkdir -p ~/.pip/ \
-&& echo '[global]\
-timeout = 6000\
-index-url = https://mirrors.aliyun.com/pypi/simple/\
-trusted-host = mirrors.aliyun.com'\
-> ~/.pip/pip.conf
 ENV DOWNLOAD_URL https://github.com/haifengat/ctp_real_md/archive/master.zip
+RUN mkdir /real_md
 WORKDIR /real_md
 RUN set -ex; \
     apt-get update && apt-get install -y --no-install-recommends wget unzip; \

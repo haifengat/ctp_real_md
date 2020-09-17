@@ -1,5 +1,6 @@
 FROM haifengat/centos:8.2
 ENV DOWNLOAD_URL https://github.com/haifengat/ctp_real_md/archive/master.zip
+RUN mkdir /real_md
 WORKDIR /real_md
 RUN set -ex; \
     apt-get update && apt-get install -y --no-install-recommends wget unzip; \
