@@ -1,13 +1,16 @@
-FROM haifengat/centos:8.2
-ENV DOWNLOAD_URL https://github.com/haifengat/ctp_real_md/archive/master.zip
+FROM python:3.6.12-slim
 
-RUN mkdir /real_md && yum install -y unzip
-WORKDIR /real_md
-ADD "${DOWNLOAD_URL}" .
-RUN unzip master.zip; \
-    rm master.zip -rf; \
-    pip install --no-cache-dir -r ./ctp_real_md-master/requirements.txt
+ENV PROJECT=ctp_real_md
 
-ENTRYPOINT ["python", "./ctp_real_md-master/tick_ctp.py"]
+ENV DOWNLOAD_URL "https://github.com/haifengat/${PROJECT}/archive/master.zip"
+WORKDIR /
+RUN set -ex; \
+    apt-get update && apt-get install -y --no-install-recommends wget unzip; \
+    wget -O master.zip "${DOWNLOAD_URL}"; \
+    unzip master.zip; \
+    rm master.zip -rf;
 
- 
+WORKDIR /${PROJECT}-master
+RUN pip install --no-cache-dir -r ./requirements.txt
+
+ENTRYPOINT ["python", "tick_ctp.sh"]

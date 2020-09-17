@@ -22,27 +22,29 @@ ENV login_info 008105/1/9999/simnow_client_test/0000000000000000
 ENTRYPOINT ["python", "/home/tick_ctp.py"]
 ```
 ```dockerfile
-version: '3.1'
+version: "3.7"
 services:
-  real_md:
-    image: haifengat/ctp_real_md:slim
-    container_name: real_md_slim
+    real_md:
+    image: haifengat/ctp_real_md
+    container_name: real_md
     restart: always
     environment:
-      - "TZ=Asia/Shanghai"
-      - "redis_addr=redis_tick:6379"
-      - "front_trade=tcp://180.168.146.187:10101"
-      - "front_quote=tcp://180.168.146.187:10111"
-      - "login_info=008105/1/9999/simnow_client_test/0000000000000000"
+        - "TZ=Asia/Shanghai"
+        - "redis_addr=redis_tick:6379"
+        - "front_trade=tcp://180.168.146.187:10101"
+        - "front_quote=tcp://180.168.146.187:10111"
+        - "login_info=008105/1/9999/simnow_client_test/0000000000000000"
     depends_on:
-      - redis_tick
+        - redis_tick
 
-  redis_tick:
-    image: redis:6.0.8-alpine3.12
-    container_name: redis_tick_alpine
-    restart: always
-    environment:
-      - TZ=Asia/Shanghai
+    redis_tick:
+        image: redis:6.0.8-alpine3.12
+        container_name: redis_tick
+        restart: always
+        environment:
+            - TZ=Asia/Shanghai
+        # ports:
+        #     - "16379:6379"
 ```
 
 ### build
